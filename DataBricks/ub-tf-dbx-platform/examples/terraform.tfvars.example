@@ -1,0 +1,151 @@
+########################################
+# Identity
+########################################
+
+product_name = "damage-prevention"
+service      = "databricks"
+environment  = "intg"
+region       = "us-east-2"
+
+########################################
+# Workspace Authentication
+########################################
+# Personal Access Token with permissions to:
+# - Create clusters
+# - Create catalogs
+# - Manage Unity Catalog
+# 
+# 2-PASS DEPLOYMENT (Recommended):
+# - Pass-1: Leave workspace_pat empty (no PAT needed for workspace/UC creation)
+# - After Pass-1: Create PAT in workspace, then add it to terraform.tfvars
+# - Pass-2: Provide workspace_pat in terraform.tfvars - Terraform automatically stores it in Secrets Manager
+#
+# OPTION 1 (Recommended - 2-Pass with Secrets Manager):
+# For Pass-1, leave empty. After workspace creation, add PAT to terraform.tfvars for Pass-2.
+workspace_pat = ""  # Leave empty for Pass-1, add PAT here for Pass-2 (Terraform stores it automatically)
+use_secrets_manager = true  # Default: true - enables automatic credential storage/retrieval
+
+# OPTION 2: Override Secrets Manager (if needed)
+# workspace_pat_override = "dapi1234567890abcdef..."  # Override PAT from Secrets Manager
+# workspace_url_override = "https://custom-url.cloud.databricks.com"  # Override workspace URL
+
+# OPTION 3: Provide manually (Single-Pass - PAT must exist before terraform apply)
+# workspace_pat = "dapi1234567890abcdef..."  # CHANGE: Your Databricks PAT (must exist before apply)
+# use_secrets_manager = false  # Disable Secrets Manager, use variables only
+
+########################################
+# Databricks Account / MWS
+########################################
+
+databricks_account_id          = "1234567890123456"   # CHANGE
+mws_credentials_id             = "cred-intg-001"      # CHANGE
+mws_storage_config_id          = "storage-intg-001"   # CHANGE
+mws_network_id                 = "network-intg-001"   # CHANGE
+mws_private_access_settings_id = "pas-intg-001"       # CHANGE
+
+########################################
+# Unity Catalog Required Variables
+########################################
+# These are required for Unity Catalog metastore creation
+aws_account_id        = "123456789012"                 # CHANGE: Your AWS account ID
+unity_metastore_owner = "admin@example.com"            # CHANGE: UC metastore owner email
+prefix                = "dp"                          # CHANGE: Resource prefix (e.g., 'dp', 'prod')
+
+########################################
+# Existing VPC
+########################################
+
+vpc_id = "vpc-0123456789abcdef0"                      # CHANGE
+
+private_subnet_ids = [
+  "subnet-aaa111",                                    # CHANGE
+  "subnet-bbb222",                                    # CHANGE
+]
+
+security_group_ids = [
+  "sg-0123abcd",                                      # CHANGE
+]
+
+########################################
+# Mandatory tags (validated in Repo 1)
+########################################
+
+tags = {
+  owner      = "data-platform-team"
+  env        = "intg"
+  product    = "damage-prevention"
+  service    = "databricks"
+  repo       = "ub-tf-dbx-platform"
+  created_by = "terraform"
+  customer   = "urbint"
+  region     = "us-east-2"
+}
+
+########################################
+# Workspace + UC + Multiple Clusters + Multiple Catalogs
+########################################
+
+workspace = {
+  ######################################
+  # Workspace
+  ######################################
+  workspace_name = "dp-intg-ws"
+  pricing_tier   = "STANDARD"
+
+  ######################################
+  # Unity Catalog metastore
+  ######################################
+  uc_metastore_name   = "dp-intg-metastore"
+  uc_metastore_region = "us-east-2"
+  uc_external_prefix  = "s3://dp-intg-uc/"
+  uc_storage_role_arn = "arn:aws:iam::123456789012:role/uc-role"  # CHANGE
+
+  ######################################
+  # Multiple clusters in this workspace
+  ######################################
+  clusters = {
+    cl1 = {
+      cluster_name  = "dp-intg-cluster-a"
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "i3.xlarge"
+      num_workers   = 2
+    }
+
+    cl2 = {
+      cluster_name  = "dp-intg-cluster-b"
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "i3.2xlarge"
+      num_workers   = 3
+    }
+
+    cl3 = {
+      cluster_name  = "dp-intg-cluster-c"
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "m5.xlarge"
+      num_workers   = 4
+    }
+  }
+
+  ######################################
+  # Multiple catalogs in this metastore
+  ######################################
+  catalogs = {
+    catalog1 = {
+      storage_root = "s3://dp-intg-uc/catalog1/"  # Storage root for managed tables
+      grants       = []                            # Optional: list of grants
+    }
+    catalog2 = {
+      storage_root = "s3://dp-intg-uc/catalog2/"
+      grants = [
+        {
+          principal  = "data-engineers"
+          privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+        }
+      ]
+    }
+    catalog3 = {
+      storage_root = "s3://dp-intg-uc/catalog3/"
+      grants       = []
+    }
+  }
+}

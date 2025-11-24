@@ -1,0 +1,38 @@
+databricks_account_id = "<MWS_ACCOUNT_ID>"
+databricks_username   = "<your_email@company.com>"
+
+
+workspace_id  = "<workspace-id-from-workspace-module-output>"
+workspace_url = "<https://dbc-xxxxxxxx.cloud.databricks.com>"
+workspace_pat = "<paste_workspace_pat>"
+
+metastore_name   = "urbint-staging-metastore"
+metastore_region = "us-east-2"
+
+external_bucket  = "my-uc-bucket"
+external_prefix  = "staging"
+s3_iam_role_arn  = "arn:aws:iam::123456789012:role/databricks-uc-role"
+
+catalogs = 
+{
+  "main" = ["default"]
+
+} 
+schemas  = {
+  main = ["default"]
+}
+
+
+ tags variable is required at runtime.
+# Terraform will prompt for values during plan/apply if not provided.
+# Example structure:
+# tags = {
+#   owner       = "platform"
+#   product     = "data-platform"
+#   env         = "staging"
+#   service     = "unity-catalog"
+#   repo        = "terraform-modules"
+#   created_by  = "terraform"
+#   customer    = "urbint"
+#   region      = "us-east-2"
+# }

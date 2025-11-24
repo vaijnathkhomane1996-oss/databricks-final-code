@@ -1,0 +1,27 @@
+project                  = "data-platform"
+env                      = "staging"
+region                   = "us-east-2"
+
+databricks_account_id    = "<MWS_ACCOUNT_ID>"
+databricks_username      = "<your_email@company.com>"
+
+private_access_settings_id = "<pas-xxxx>"
+credentials_id             = "<cred-xxxx>"
+storage_configuration_id   = "<sc-xxxx>"
+network_id                 = "<net-xxxx>"
+
+pricing_tier = "premium"
+
+# tags variable is required at runtime.
+# Terraform will prompt for values during plan/apply if not provided.
+# Example structure:
+# tags = {
+#   owner       = "platform"
+#   product     = "data-platform"
+#   env         = "staging"
+#   service     = "unity-catalog"
+#   repo        = "terraform-modules"
+#   created_by  = "terraform"
+#   customer    = "urbint"
+#   region      = "us-east-2"
+# }

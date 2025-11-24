@@ -1,0 +1,29 @@
+# Workspace Authentication
+workspace_url = "https://adb-1234567890123456.7.databricks.azure.cn"
+workspace_pat = "your-personal-access-token-here"
+
+# Catalog Configuration
+name         = "my_catalog"
+storage_root = "s3://my-bucket/catalogs/my_catalog/"
+comment      = "My Unity Catalog catalog for data storage"
+
+# Grants (optional)
+grants = [
+  {
+    principal  = "data-engineers"
+    privileges = ["USE_CATALOG"]
+  }
+]
+
+# Required Tags
+tags = {
+  owner      = "data-team"
+  env        = "stag"  # Must be one of: intg, stag, prod, demo
+  product    = "data-platform"
+  service    = "databricks"
+  repo       = "ub-tf-aws-databricks"
+  created_by = "terraform"
+  customer   = "internal"
+  region     = "us-east-2"
+}
+

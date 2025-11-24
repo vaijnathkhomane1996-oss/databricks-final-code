@@ -1,0 +1,137 @@
+########################################
+# Required: Identity
+########################################
+
+product_name = "damage-prevention"  # CHANGE: Your product name
+region       = "us-east-2"          # CHANGE: Your AWS region
+
+########################################
+# Required: Databricks Account / MWS
+########################################
+
+databricks_account_id          = "1234567890123456"   # CHANGE: Your Databricks account ID
+mws_credentials_id             = "cred-intg-001"      # CHANGE: MWS credentials ID
+mws_storage_config_id          = "storage-intg-001"  # CHANGE: MWS storage config ID
+mws_network_id                 = "network-intg-001"  # CHANGE: MWS network ID
+mws_private_access_settings_id = "pas-intg-001"      # CHANGE: MWS private access settings ID
+
+########################################
+# Required: Existing VPC
+########################################
+
+vpc_id = "vpc-0123456789abcdef0"  # CHANGE: Your VPC ID
+
+private_subnet_ids = [
+  "subnet-aaa111",  # CHANGE: Your private subnet IDs (at least 2)
+  "subnet-bbb222",
+]
+
+security_group_ids = [
+  "sg-0123abcd",  # CHANGE: Your security group IDs
+]
+
+########################################
+# Required: Workspace Storage Configuration
+########################################
+
+root_storage_bucket   = "damage-prevention-intg-root-bucket"  # CHANGE: S3 bucket name for root storage
+cross_account_role_arn = "arn:aws:iam::123456789012:role/databricks-cross-account-role"  # CHANGE: IAM role ARN for cross-account access
+
+########################################
+# Required: Tags (only owner and customer needed)
+########################################
+
+tags = {
+  owner    = "data-platform-team"  # CHANGE: Resource owner
+  customer = "urbint"              # CHANGE: Your customer name
+}
+
+########################################
+# Required: Workspace Configuration
+########################################
+
+workspace = {
+  pricing_tier        = "STANDARD"  # STANDARD, PREMIUM, or ENTERPRISE
+  uc_storage_role_arn = "arn:aws:iam::123456789012:role/uc-role"  # CHANGE: IAM role ARN for UC
+
+  clusters = {
+    cl1 = {
+      cluster_name  = "dp-intg-cluster-a"  # CHANGE: Cluster name
+      spark_version = "13.3.x-scala2.12"   # CHANGE: Spark version
+      node_type_id  = "i3.xlarge"          # CHANGE: Instance type
+      num_workers   = 2                    # CHANGE: Number of workers
+    }
+    cl2 = {
+      cluster_name  = "dp-intg-cluster-b"
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "i3.2xlarge"
+      num_workers   = 3
+    }
+    cl3 = {
+      cluster_name  = "dp-intg-cluster-c"
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "m5.xlarge"
+      num_workers   = 4
+    }
+  }
+
+  catalogs = {
+    intg_catalog1 = {
+      grants = []  # Optional: grants list
+    }
+    intg_catalog2 = {
+      grants = [
+        {
+          principal  = "data-engineers"  # CHANGE: Principal name
+          privileges = ["USE_CATALOG"]
+        }
+      ]
+    }
+    intg_catalog3 = {
+      grants = [
+        {
+          principal  = "data-engineers"  # CHANGE: Principal name
+          privileges = ["USE_CATALOG"]
+        }
+      ]
+    }
+  }
+}
+
+########################################
+# Required: Unity Catalog
+########################################
+
+aws_account_id        = "123456789012"        # CHANGE: Your AWS account ID
+unity_metastore_owner = "admin@example.com"   # CHANGE: UC metastore owner email
+
+########################################
+# Required: Shared Metastore (from existing metastore)
+########################################
+# ⚠️ IMPORTANT: All environments use the same existing metastore.
+# Get metastore_id from:
+# - Databricks Account Console → Unity Catalog → Metastores
+# - Or from your existing metastore (if created manually or via another deployment)
+# 
+# Note: Staging also uses this same existing metastore (does not create a new one)
+
+shared_metastore_id = "abc12345-def6-7890-ghij-klmnopqrstuv"  # CHANGE: ID of existing metastore to use
+
+########################################
+# Secrets Manager Configuration (Optional)
+########################################
+# Terraform automatically stores/retrieves workspace credentials from AWS Secrets Manager
+# 
+# For Pass-1: Leave workspace_pat empty (no PAT needed for workspace creation)
+# For Pass-2: Add your PAT here - Terraform will automatically store it in Secrets Manager
+#
+# The secret name format: {product_name}-{environment}-{region}-databricks-workspace
+# Example: damage-prevention-intg-us-east-2-databricks-workspace
+
+workspace_pat = ""  # Leave empty for Pass-1, add PAT here for Pass-2 (Terraform stores it automatically)
+use_secrets_manager = true  # Default: true - enables automatic credential storage/retrieval
+
+# Optional: Override Secrets Manager values (if needed)
+# workspace_pat_override = "dapi1234567890abcdef..."  # Override PAT from Secrets Manager
+# workspace_url_override = "https://custom-url.cloud.databricks.com"  # Override workspace URL
+
