@@ -64,10 +64,12 @@ resource "aws_secretsmanager_secret_version" "databricks_workspace" {
   # Use replace_triggered_by to force update when PAT changes
   # This ensures Terraform updates the secret when workspace_pat is provided in Pass-2
   # No need for manual script - just provide workspace_pat in terraform.tfvars
-  replace_triggered_by = [
-    var.workspace_pat,
-    var.workspace_pat_override
-  ]
+  lifecycle {
+    replace_triggered_by = [
+      var.workspace_pat,
+      var.workspace_pat_override
+    ]
+  }
   
   # Note: Removed ignore_changes lifecycle block
   # Terraform will now automatically update the secret when PAT is provided
